@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Daniel">
+
+    <title>karaoke</title>
+</head>
+
+<body id="mybody">
+    <video id="song" controls>
+        <source id="lyricSource" src="edsheeran.mp3" type="audio/mpeg">
+    </video>
+    <div id="subtitle" class="soustitre"></div>
+    <button onclick="getCurTime()" type="button">Get current time position</button>
+</body>
+
+</html>
+
+<script>
+    var vid = document.getElementById('song')
+ 
+    function getCurTime() {
+        alert(vid.currentTime);
+    }
+    table = []
+    tabl = []
+    tableDesMin = []
+    tableDesSec = []
+    totaleSecondes = []
+    mili = []
+    ValNumTranslate = []
+    subtitle = []
+    prep_transl = []
+
+    function lireFichierTexte(fichier, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                callback(xhr.responseText);
+            }
+        };
+        xhr.open("GET", fichier, false);
+        xhr.send(null);
+    }
+
+    function mycallback(toto) {
+        tabl.push(toto)
+    }
+    var toto = lireFichierTexte('Sheeran.lrc.txt', mycallback);
+    
+
+    var joine = tabl.join(',')
+    var fruits_array = joine.split("\n");
+    for (var i = 0; i < fruits_array.length; i++) {
+        var NombreMinutes = fruits_array[i].substring(
+            fruits_array[i].lastIndexOf("[") + 1,
+            fruits_array[i].lastIndexOf(":")
+        );
+        tableDesMin.push(NombreMinutes * 60)
+    }
+    for (var a = 0; a < fruits_array.length; a++) {
+        var NombreSecondes = fruits_array[a].substring(
+            fruits_array[a].lastIndexOf(":") + 1,
+            fruits_array[a].lastIndexOf(".")
+        );
+        tableDesSec.push(NombreSecondes)
+    }
+    for (var c = 0; c < fruits_array.length; c++) {
+        var Seconds = Number((tableDesMin[c])) + Number((tableDesSec[c]))
+        totaleSecondes.push(Seconds)
+    }
+
+
+
+    for (var d = 0; d < fruits_array.length; d++) {
+        var milisecondes = fruits_array[d].substring(
+            fruits_array[d].lastIndexOf(".") + 1,
+            fruits_array[d].lastIndexOf("]")
+        );
+        mili.push(milisecondes)
+    }
+
+
+    for (var e = 0; e < fruits_array.length; e++) {
+        var total = ((totaleSecondes[e]) + ('.' + mili[e] + '0000'))
+        ValNumTranslate.push(total)
+    }
+    console.log(ValNumTranslate)
+
+    for (var f = 0; f < fruits_array.length; f++) {
+        var soustitre = fruits_array[f].substring(
+            fruits_array[f].lastIndexOf("]") + 1,
+        );
+        subtitle.push(soustitre)
+    }
+
+    console.log(subtitle)
+    vid.addEventListener('timeupdate', function () {
+        for (var p = 0; p < fruits_array.length; p++) {
+            if (vid.currentTime > ValNumTranslate[p]) {
+                document.getElementById('subtitle').innerHTML = subtitle[p]
+            }
+        }
+    })
+</script>
